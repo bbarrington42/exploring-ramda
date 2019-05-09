@@ -46,9 +46,6 @@ const readFileSync = path => fs.readFileSync(path, {encoding: 'utf8'});
 // Get the basename of the filename w/o the extension
 const name = filename => path.basename(filename, '.csv');
 
-// Given a header array and an array of data arrays, return an array of objects.
-const content = headers => R.map(R.zipObj(headers));
-
 // Given the contents of a file as a string, transform into an array of lines filtering out any empties
 const getLines = R.pipe(
     R.split(/\r\n|\r|\n/),
@@ -59,22 +56,25 @@ const getLines = R.pipe(
 const getWords = R.map(R.split(/\s*,\s*/));
 
 
-const s = readFileSync('../data/csv1.csv');
-const lines = getLines(s);
-const words = getWords(lines);
-const header = R.flatten(R.take(1, words));
-const rest = R.drop(1, words);
+// Extract header and rest of lines
+const extractHeader = R.map(R.converge((header, rest) => [R.flatten(header), rest])([R.take(1), R.drop(1)]));
 
-const objects = R.map(R.zipObj(header))(rest);
+const getObjects = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
 
 
-console.log(objects);
+const r = R.pipe(
+    R.map(readFileSync),
+    R.map(R.split(/\r\n|\r|\n/)),
+    R.map(R.filter(R.pipe(R.prop('length'), len => len > 0))),
+    R.map(getWords),
+    extractHeader,
+    getObjects
+)(['../data/csv1.csv','../data/csv2.csv']);
+
+console.log(r);
 
 
 
-
-
-// Pipeline: filename -> {name: s, contents: s} -> {name: s, contents: [[s,s,...], ...]} ->
 
 
 
