@@ -50,6 +50,8 @@ const logger = (msg, s) => {
     return s;
 };
 
+const input = ['../data/csv1.csv', '../data/csv2.csv'];
+
 const nonEmpty = a => !R.isEmpty(a);
 
 
@@ -73,11 +75,11 @@ const extractHeader = R.map(R.converge((header, rest) => [R.flatten(header), res
 
 const getObjects = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
 
-// Adds name attribute to the object and puts all entries under the attribute 'contents'
-const embellish = arr => {
-  return {
-      contents: arr
-  }
+const addNameWithContents = (filename, contents) => {
+    return {
+        name: name(filename),
+        contents
+    }
 };
 
 
@@ -91,11 +93,14 @@ const r = R.pipe(
         )
     ),
     extractHeader,
-    getObjects,
-    R.map(embellish)
-)(['../data/csv1.csv', '../data/csv2.csv']);
+    getObjects
+)(input);
 
-console.log(JSON.stringify(r));
+// Now modify each nested array to be an object
+const r1 = R.zipWith(addNameWithContents, input, r);
+
+
+console.log(JSON.stringify(r1));
 
 
 
