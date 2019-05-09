@@ -55,10 +55,12 @@ const fromFile = R.map(R.pipe(readFileSync, getLines, getWords));
 
 
 // Extract header and rest of lines. The header must flattened as it's entries are the attribute names for each row
-const extractHeader = R.map(R.converge((header, rest) => [R.flatten(header), rest])([R.take(1), R.drop(1)]));
+const extractHeader = R.converge((header, rest) => [R.flatten(header), rest])([R.take(1), R.drop(1)]);
 
 // Create objects by zipping the header with the rows
-const zipRows = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
+const zipRows = arr => R.map(R.zipObj(arr[0]), arr[1]);
+
+const makeObjects = R.map(R.pipe(extractHeader, zipRows));
 
 const addNameWithContents = (filename, contents) => {
     return {
@@ -68,11 +70,7 @@ const addNameWithContents = (filename, contents) => {
 };
 
 
-const r = R.pipe(
-    fromFile,
-    extractHeader,
-    zipRows
-)(input);
+const r = R.pipe(fromFile, makeObjects)(input);
 
 // Now modify each nested array to be an object
 const r1 = R.zipWith(addNameWithContents, input, r);
