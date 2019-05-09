@@ -25,20 +25,6 @@ const fs = require('fs');
  }
  */
 
-// Some test data
-const headers = ['header1', 'header2', 'header3'];
-const data = [
-    ['data11', 'data12', 'data13'],
-    ['data21', 'data22', 'data23'],
-    ['data31', 'data32', 'data33']
-];
-
-const testLines = [
-    'header1, header2, header3',
-    'data11, data12, data13',
-    'data21, data22, data23',
-    'data31, data32, data33'
-];
 
 const logger = (msg, s) => {
     if(s === undefined) {
@@ -52,8 +38,6 @@ const logger = (msg, s) => {
 
 const input = ['../data/csv1.csv', '../data/csv2.csv'];
 
-const nonEmpty = a => !R.isEmpty(a);
-
 
 const readFileSync = path => fs.readFileSync(path, {encoding: 'utf8'});
 
@@ -61,19 +45,20 @@ const readFileSync = path => fs.readFileSync(path, {encoding: 'utf8'});
 const name = filename => path.basename(filename, '.csv');
 
 // Given the contents of a file as a string, transform into an array of lines filtering out any empties
-const getLines = R.pipe(
-    R.split(/\r\n|\r|\n/),
-    R.filter(nonEmpty)
-);
+const getLines = R.pipe(R.split(/\r\n|\r|\n/), R.reject(R.isEmpty));
 
 // Given the lines of a file, return an array of word arrays
 const getWords = R.map(R.split(/\s*,\s*/));
 
+// Combine the preceding to transform a file name to an array of the contents
+const fromFile = R.map(R.pipe(readFileSync, getLines, getWords));
 
-// Extract header and rest of lines
+
+// Extract header and rest of lines. The header must flattened as it's entries are the attribute names for each row
 const extractHeader = R.map(R.converge((header, rest) => [R.flatten(header), rest])([R.take(1), R.drop(1)]));
 
-const getObjects = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
+// Create objects by zipping the header with the rows
+const zipRows = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
 
 const addNameWithContents = (filename, contents) => {
     return {
@@ -84,16 +69,9 @@ const addNameWithContents = (filename, contents) => {
 
 
 const r = R.pipe(
-    R.map(
-        R.pipe(
-            readFileSync,
-            getLines,
-            getWords,
-            //logger
-        )
-    ),
+    fromFile,
     extractHeader,
-    getObjects
+    zipRows
 )(input);
 
 // Now modify each nested array to be an object
