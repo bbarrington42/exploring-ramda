@@ -40,6 +40,18 @@ const testLines = [
     'data31, data32, data33'
 ];
 
+const logger = (msg, s) => {
+    if(s === undefined) {
+        s = msg;
+        msg = '-->: '
+    }
+    const js = JSON.stringify(s);
+    console.log(`${msg}${js}`);
+    return s;
+};
+
+const nonEmpty = a => !R.isEmpty(a);
+
 
 const readFileSync = path => fs.readFileSync(path, {encoding: 'utf8'});
 
@@ -49,7 +61,7 @@ const name = filename => path.basename(filename, '.csv');
 // Given the contents of a file as a string, transform into an array of lines filtering out any empties
 const getLines = R.pipe(
     R.split(/\r\n|\r|\n/),
-    R.filter(R.pipe(R.prop('length'), len => len > 0))
+    R.filter(nonEmpty)
 );
 
 // Given the lines of a file, return an array of word arrays
@@ -66,12 +78,9 @@ const r = R.pipe(
     R.map(
         R.pipe(
             readFileSync,
-            R.split(/\r\n|\r|\n/),
-            R.filter(R.pipe(
-                R.prop('length'),
-                len => len > 0)
-            ),
-            getWords
+            getLines,
+            getWords,
+            //logger
         )
     ),
     extractHeader,
