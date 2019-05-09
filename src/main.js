@@ -63,18 +63,22 @@ const getObjects = R.map(arr => R.map(R.zipObj(arr[0]), arr[1]));
 
 
 const r = R.pipe(
-    R.map(readFileSync),
-    R.map(R.split(/\r\n|\r|\n/)),
-    R.map(R.filter(R.pipe(R.prop('length'), len => len > 0))),
-    R.map(getWords),
+    R.map(
+        R.pipe(
+            readFileSync,
+            R.split(/\r\n|\r|\n/),
+            R.filter(R.pipe(
+                R.prop('length'),
+                len => len > 0)
+            ),
+            getWords
+        )
+    ),
     extractHeader,
     getObjects
-)(['../data/csv1.csv','../data/csv2.csv']);
+)(['../data/csv1.csv', '../data/csv2.csv']);
 
 console.log(r);
-
-
-
 
 
 
