@@ -27,9 +27,9 @@ const fs = require('fs');
 
 
 const logger = (msg, s) => {
-    if(s === undefined) {
+    if (s === undefined) {
         s = msg;
-        msg = '-->: '
+        msg = '-->: ';
     }
     const js = JSON.stringify(s);
     console.log(`${msg}${js}`);
@@ -66,17 +66,14 @@ const addNameWithContents = (filename, contents) => {
     return {
         name: name(filename),
         contents
-    }
+    };
 };
 
 
-const r = R.pipe(fromFile, makeObjects)(input);
-
-// Now modify each nested array to be an object
-const r1 = R.zipWith(addNameWithContents, input, r);
+const r = R.pipe(fromFile, makeObjects, R.zipWith(addNameWithContents, input))(input);
 
 
-console.log(JSON.stringify(r1));
+console.log(JSON.stringify(r));
 
 
 
