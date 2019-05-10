@@ -7,22 +7,15 @@ const createRow = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
 
 const createTable = () => R.map(createRow)(R.range(0, 9));
 
-const table = createTable();
-
-console.table(table);
-
 const getRow = table => row => table[row];
 
 const getColumn = table => column => R.map(row => row[column])(table);
 
-const diagLtoR = table => R.map(n => table[n][n])(R.range(0, 9));
+const getMainDiag = table => R.addIndex(R.map)((row, index) => row[index])(table);
 
-const diagRtoL = table => R.map(n => table[n][n])(R.reverse(R.range(0, 9)));
+const getBackDiag = table => R.addIndex(R.map)((row, index) => row[8 - index])(table);
 
-const getSquare =
+const getArea =
     table =>
-        rowStart =>
-            colStart =>
-                R.map(row => R.map(col => table[rowStart + row][colStart + col])(R.range(0, 3)))(R.range(0, 3));
-
-console.log(getSquare(table)(0)(3));
+        x =>
+            y => R.chain(R.slice(x * 3, x * 3 + 3))(R.map(row => table[row])(R.range(y * 3, y * 3 + 3)));
