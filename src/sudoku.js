@@ -3,9 +3,13 @@
 
 const R = require('ramda');
 
-const createRow = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
+const createRow = () => R.repeat(null, 9);
+const createTable = () => R.times(createRow, 9);
 
-const createTable = () => R.map(createRow)(R.range(0, 9));
+// These 2 for testing
+const createRow2 = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
+const createTable2 = () => R.map(createRow2)(R.range(0, 9));
+
 
 const getRow = table => row => table[row];
 
