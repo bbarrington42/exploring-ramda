@@ -53,11 +53,13 @@ const allDistinct = values => {
         return R.isNil(head) ? true : R.includes(head)(tail) ? false : loop(tail);
     };
 
+    // Filter out all nulls first
     return loop(R.reject(R.isNil)(values));
 };
 
 
 // Individual constraint checks.
+// It's important that the array is passed last to all of these so that it can be used as argument to R.propSatisfies(...
 const rowDistinct = row => rows => allDistinct(rows[row]);
 
 const colDistinct = col => cols => allDistinct(cols[col]);
@@ -78,6 +80,8 @@ console.table(table);
 
 const validate = table => (row, col) => {
     const constraints = getAllConstraints(table);
+
+    // Create an array of validation functions.
     const validators = [
         R.propSatisfies(rowDistinct(row), 'rows'),
         R.propSatisfies(colDistinct(col), 'cols'),
@@ -85,6 +89,7 @@ const validate = table => (row, col) => {
         R.propSatisfies(diagDistinct(row, col), 'diags')
     ];
 
+    // Apply each validator to the constraints and return false if any fail.
     return R.all(R.identity, R.map(f => f(constraints))(validators));
 };
 
