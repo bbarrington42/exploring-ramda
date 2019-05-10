@@ -11,7 +11,6 @@ const createRow2 = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
 const createTable2 = () => R.map(createRow2)(R.range(0, 9));
 
 const table = createTable2();
-console.table(table);
 
 
 const getRow = table => row => table[row];
@@ -29,6 +28,14 @@ const getArea =
 
 const getAllAreas = table =>
     R.chain(x => R.map(y => getArea(table)(x, y), R.range(0, 3)))(R.range(0, 3));
+
+/*
+ Notable differences between my implementation and Zsolt's.
+ Mine is probably overkill in that it validates a specific cell. Zsolt's implementation is much simpler in that
+ it checks the entire table regardless of the which cell changed?
+ But I learned a lot by implementing it this way. ;-) In particular, the use of R.propSatisfies... in the validation
+ function.
+ */
 
 const getAllConstraints = table => {
     const rows = table;
@@ -66,6 +73,8 @@ const diagDistinct = (row, col) => diags => {
     return true;
 };
 
+//table[3][4] = '3-3';
+console.table(table);
 
 const validate = table => (row, col) => {
     const constraints = getAllConstraints(table);
@@ -79,4 +88,8 @@ const validate = table => (row, col) => {
     return R.all(R.identity, R.map(f => f(constraints))(validators));
 };
 
-console.log(validate(table)(0, 0));
+
+//const r = R.chain(x => R.map(y => validate(table)(x, y))(R.range(0, 9)))(R.range(0, 9));
+//console.log(r);
+
+
