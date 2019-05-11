@@ -1,7 +1,7 @@
 'use strict';
 
-
-const R = require('ramda');
+import * as R from 'ramda';
+//const R = require('ramda');
 
 const createRow = () => R.repeat(null, 9);
 const createTable = () => R.times(createRow, 9);
