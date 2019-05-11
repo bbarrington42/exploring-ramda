@@ -1,7 +1,7 @@
 'use strict';
 
-import * as R from 'ramda';
-//const R = require('ramda');
+//import * as R from 'ramda';
+const R = require('ramda');
 
 const createRow = () => R.repeat(null, 9);
 const createTable = () => R.times(createRow, 9);
@@ -59,7 +59,8 @@ const allDistinct = values => {
 
 
 // Individual constraint checks.
-// It's important that the array is passed last to all of these so that it can be used as argument to R.propSatisfies(...
+// It's important that the array is passed last to all of these so that it can be used as argument to
+// R.propSatisfies(...
 const rowDistinct = row => rows => allDistinct(rows[row]);
 
 const colDistinct = col => cols => allDistinct(cols[col]);
@@ -78,23 +79,39 @@ const diagDistinct = (row, col) => diags => {
 //table[3][4] = '3-3';
 console.table(table);
 
-const validate = table => (row, col) => {
+// Validate single cell
+const validateCell = table => (row, col) => {
     const constraints = getAllConstraints(table);
 
     // Create an array of validation functions.
     const validators = [
-        R.propSatisfies(rowDistinct(row), 'rows'),
-        R.propSatisfies(colDistinct(col), 'cols'),
-        R.propSatisfies(areaDistinct(row, col), 'areas'),
-        R.propSatisfies(diagDistinct(row, col), 'diags')
+        R.propSatisfies(rowDistinct(row))('rows'),
+        R.propSatisfies(colDistinct(col))('cols'),
+        R.propSatisfies(areaDistinct(row, col))('areas'),
+        R.propSatisfies(diagDistinct(row, col))('diags')
     ];
 
     // Apply each validator to the constraints and return false if any fail.
     return R.all(R.identity, R.map(f => f(constraints))(validators));
 };
 
+// Validate the entire table
+const validateTable = table => {
+    const constraints = getAllConstraints(table);
 
-//const r = R.chain(x => R.map(y => validate(table)(x, y))(R.range(0, 9)))(R.range(0, 9));
+    // Concatenate all the constraints into one array
+    const allConstraints = R.reduce((a, p) => R.concat(a, p), [], R.props(['rows', 'cols', 'areas', 'diags'], constraints));
+
+    // Then map and reduce into one Boolean
+    return R.reduce((a, b) => a && b, true, R.map(constraint => allDistinct(constraint), allConstraints));
+
+};
+
+const r = validateCell(table)(3, 3);
+console.log(r);
+
+
+//const r = R.chain(x => R.map(y => validateCell(table)(x, y))(R.range(0, 9)))(R.range(0, 9));
 //console.log(r);
 
 
