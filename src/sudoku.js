@@ -76,7 +76,7 @@ const diagDistinct = (row, col) => diags => {
     return true;
 };
 
-//table[3][4] = '3-3';
+table[3][4] = '3-3';
 console.table(table);
 
 // Validate single cell
@@ -102,8 +102,8 @@ const validateTable = table => {
     // Concatenate all the constraints into one array
     const allConstraints = R.reduce((a, p) => R.concat(a, p), [], R.props(['rows', 'cols', 'areas', 'diags'], constraints));
 
-    // Then map and reduce into one Boolean
-    return R.reduce((a, b) => a && b, true, R.map(constraint => allDistinct(constraint), allConstraints));
+    // Then map and check for truth
+    return R.all(R.identity, R.map(constraint => allDistinct(constraint), allConstraints));
 
 };
 
