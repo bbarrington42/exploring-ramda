@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 import _ from 'lodash';
 
+import {setCell} from './sudoku';
+
 const templateString =
     document.getElementsByClassName('js-table-template')[0].innerHTML;
 
@@ -26,12 +28,27 @@ const addClickEvent = item =>
 const addAllClickEvents = table =>
     R.forEach(addClickEvent, document.getElementsByClassName('js-sudoku-cell'));
 
-const addKeyEvent = table => null;
+const insertValue = (key, table) => {
+    const selectedNode = document.getElementsByClassName('js-selected')[0];
+    if (selectedNode) {
+        const dataset = selectedNode.dataset;
+        const value = parseInt(key) || null;
+        renderTable(setCell(table, dataset.row, dataset.column, value));
+    }
+};
+
+export const addKeyEvent = table =>
+    window.addEventListener('keypress', event => {
+        console.log('event', event);
+        const key = event.key;
+        if ('123456789 '.indexOf(key) >= 0) {
+            insertValue(key, table);
+        }
+    });
 
 export const renderTable = table => {
     document.getElementsByClassName('js-table')[0].innerHTML =
         tableTemplate({table});
 
     addAllClickEvents(table);
-    addKeyEvent(table);
 };

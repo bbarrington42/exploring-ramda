@@ -105,8 +105,9 @@ const validateTable = table => {
 
 };
 
-
-//const r = R.chain(x => R.map(y => validateCell(table)(x, y))(R.range(0, 9)))(R.range(0, 9));
-//console.log(r);
-
+export const setCell = (table, row, col, value) => {
+    const newTable = R.clone(table);
+    newTable[row][col] = value;
+    return newTable;
+};
 
