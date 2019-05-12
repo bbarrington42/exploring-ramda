@@ -1,5 +1,5 @@
 module.exports = {
-    entry  : ['babel-polyfill', './src/sudoku.js'],
+    entry  : ['babel-polyfill', './src/main.js'],
     mode: 'development',
     output : {
         path     : __dirname,

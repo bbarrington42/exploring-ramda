@@ -1,16 +1,16 @@
 'use strict';
 
-//import * as R from 'ramda';
-const R = require('ramda');
+import * as R from 'ramda';
+//const R = require('ramda');
 
 const createRow = () => R.repeat(null, 9);
-const createTable = () => R.times(createRow, 9);
+export const createTable = () => R.times(createRow, 9);
 
 // These 2 for testing
-const createRow2 = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
-const createTable2 = () => R.map(createRow2)(R.range(0, 9));
-
-const table = createTable2();
+// const createRow2 = x => R.map(y => `${x}-${y}`)(R.range(0, 9));
+// const createTable2 = () => R.map(createRow2)(R.range(0, 9));
+//
+// const table = createTable2();
 
 
 const getRow = table => row => table[row];
@@ -76,8 +76,6 @@ const diagDistinct = (row, col) => diags => {
     return true;
 };
 
-table[3][4] = '3-3';
-console.table(table);
 
 // Validate single cell
 const validateCell = table => (row, col) => {
@@ -106,9 +104,6 @@ const validateTable = table => {
     return R.all(R.identity, R.map(constraint => allDistinct(constraint), allConstraints));
 
 };
-
-const r = validateCell(table)(3, 3);
-console.log(r);
 
 
 //const r = R.chain(x => R.map(y => validateCell(table)(x, y))(R.range(0, 9)))(R.range(0, 9));
