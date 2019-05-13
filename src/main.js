@@ -2,9 +2,9 @@ import {createTable} from './sudoku';
 import {renderTable, addKeyEvent} from './presenter';
 
 
-let t = createTable();
+let table = createTable();
 
-renderTable(t);
+renderTable(table);
 
 
-addKeyEvent(t);
+addKeyEvent(table);

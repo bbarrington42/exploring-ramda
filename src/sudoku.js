@@ -106,8 +106,11 @@ const validateTable = table => {
 };
 
 export const setCell = (table, row, col, value) => {
-    const newTable = R.clone(table);
-    newTable[row][col] = value;
-    return newTable;
+    console.log(`before: ${table}`);
+    //const newTable = R.clone(table);
+    //newTable[row][col] = value;
+    table[row][col] = value
+    console.log(`after: ${table}`);
+    return table; //newTable;
 };
 
